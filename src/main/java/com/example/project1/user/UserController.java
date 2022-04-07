@@ -31,7 +31,8 @@ public class UserController {
     public User retrieveUser(@PathVariable int id){
         // return service.findOne(id);
 
-        /* 위의 코드 한줄 -> 두줄로 변경 : findOne - refactor - Introduce Variable
+        /*
+        위의 코드 한줄 -> 두줄로 변경 : findOne - refactor - Introduce Variable
         User user = service.findOne(id);
         return user;
         */
