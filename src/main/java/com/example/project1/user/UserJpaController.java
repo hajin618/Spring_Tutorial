@@ -16,8 +16,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/jpa")
 public class UserJpaController {
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     // 전체 사용자 조회
     @GetMapping("/users")
@@ -60,4 +64,41 @@ public class UserJpaController {
 
         return ResponseEntity.created(location).build();
    }
+
+
+   // 전체 포스트 조회
+    @GetMapping("/users/{id}/posts")
+    public List<Post> retrieveAllPostsByUser(@PathVariable int id){
+        Optional<User> user=userRepository.findById(id);
+
+        if(!user.isPresent()){
+            throw new UserNotFoundException(String.format("ID[%s] not found", id));
+        }
+
+        return user.get().getPosts();
+    }
+
+
+    // 포스트 추가
+    @PostMapping("/users/{id}/posts")
+    public ResponseEntity<Post> createPost(@PathVariable int id, @RequestBody Post post){
+
+        Optional<User> user=userRepository.findById(id);
+
+        if(!user.isPresent()){
+            throw new UserNotFoundException(String.format("ID[%s] not found", id));
+        }
+
+        // user 객체 생성
+        post.setUser(user.get());
+
+        Post savedPost = postRepository.save(post);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedPost.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+    }
 }
